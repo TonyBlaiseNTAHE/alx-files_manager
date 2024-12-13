@@ -1,13 +1,14 @@
-// Import necessary modules
-const express = require('express');
-const routes = require('./routes');
+#!/usr/bin/node
 
-// Create an Express application
-const app = express();
+const express = require("express");
+const router = require("./routes/index");
 
-// Use routes from the routes folder
-app.use('/', routes);
+const server = express();
+const PORT = process.env.PORT ? process.env.PORT : 5000;
 
-// Get the port from the environment and store in Express
-const port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`Server running on port ${port}`));
+server.use(express.json());
+server.use(router);
+
+server.listen(PORT, () =>
+  console.log(`The server is running on port: ${PORT}`)
+);

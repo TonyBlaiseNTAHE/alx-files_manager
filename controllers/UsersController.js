@@ -1,29 +1,30 @@
-const sha1 = require('sha1');
+#!/usr/bin/node
+
 const dbClient = require('../utils/db');
 
 class UsersController {
   static async postNew(req, res) {
     const { email, password } = req.body;
     if (!email) {
-      return res.status(400).json({ error: 'Missing email' });
+      res.status(400).json({ error: 'Missing email' });
+      res.end();
+      return;
     }
     if (!password) {
-      return res.status(400).json({ error: 'Missing password' });
+      res.status(400).json({ error: 'Missing password' });
+      res.end();
+      return;
     }
-
-    // Check if the email already exists in the database
-    const emailExists = await dbClient.userExists(email);
-
-    if (emailExists) {
-      return res.status(400).json({ error: 'Already exist' });
+    const userExist = await dbClient.userExist(email);
+    if (userExist) {
+      res.status(400).json({ error: 'Already exist' });
+      res.end();
+      return;
     }
-
-    // Hash the password and create the user
-    const hashedPassword = sha1(password);
-    const userId = await dbClient.createUser(email, hashedPassword);
-
-    // Return the new user's email and id
-    res.status(201).json({ id: userId, email });
+    const user = await dbClient.createUser(email, password);
+    const id = `${user.insertedId}`;
+    res.status(201).json({ id, email });
+    res.end();
   }
 }
 
